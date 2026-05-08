@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>All Meals</title>
+  <link rel="stylesheet" type="text/css" href="/styles/main.css">
+  <style>
+    .meals-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .meal-card {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      background-color: #f9f9f9;
+    }
+    .meal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .meal-name {
+      font-size: 1.5em;
+      font-weight: bold;
+      color: #333;
+    }
+    .meal-price {
+      font-size: 1.2em;
+      color: #4CAF50;
+      font-weight: bold;
+    }
+    .meal-details {
+      margin-top: 10px;
+    }
+    .detail-item {
+      margin-bottom: 5px;
+    }
+    .detail-label {
+      font-weight: bold;
+      color: #555;
+    }
+    .nav-links {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .nav-links a {
+      margin: 0 15px;
+      text-decoration: none;
+      color: #007bff;
+      font-size: 1.1em;
+    }
+    .no-meals {
+      text-align: center;
+      color: #666;
+      font-style: italic;
+    }
+    .btn {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      text-decoration: none;
+      border-radius: 4px;
+      display: inline-block;
+    }
+    .btn:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <div class="meals-container">
+    <h1>All Meals 🍽️</h1>
+    
+    <div class="nav-links">
+      <a href="/">Home</a>
+      <a href="/add-meal" class="btn">Add New Meal</a>
+    </div>
+
+    <% if (meals && meals.length > 0) { %>
+      <% meals.forEach(function(meal) { %>
+        <div class="meal-card">
+          <div class="meal-header">
+            <span class="meal-name"><%= meal.name %></span>
+            <span class="meal-price">$<%= meal.price.toFixed(2) %></span>
+          </div>
+          
+          <div class="meal-details">
+            <div class="detail-item">
+              <span class="detail-label">Type:</span> <%= meal.type %>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Protein:</span> <%= meal.protein_name %> (<%= meal.protein_preparation %>)
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Sauce/Salsa:</span> <%= meal.salsa_name %> (<%= meal.salsa_spiciness %>)
+            </div>
+            <% if (meal.created_at) { %>
+              <div class="detail-item">
+                <span class="detail-label">Added:</span> <%= new Date(meal.created_at).toLocaleDateString() %>
+              </div>
+            <% } %>
+          </div>
+        </div>
+      <% }); %>
+    <% } else { %>
+      <div class="no-meals">
+        <p>No meals found. <a href="/add-meal">Add your first meal!</a></p>
+      </div>
+    <% } %>
+  </div>
+</body>
+</html>

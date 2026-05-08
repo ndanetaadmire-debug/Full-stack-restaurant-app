@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My Orders - Restaurant System</title>
+  <link rel="stylesheet" type="text/css" href="/styles/main.css">
+  <style>
+    .orders-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .page-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      border-radius: 12px;
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .user-info {
+      text-align: right;
+    }
+    .order-card {
+      background: white;
+      border: 1px solid #e9ecef;
+      border-radius: 12px;
+      padding: 25px;
+      margin-bottom: 25px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+    }
+    .order-card:hover {
+      box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+      transform: translateY(-2px);
+    }
+    .order-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+    .order-number {
+      font-size: 1.3em;
+      font-weight: bold;
+      color: #333;
+    }
+    .order-status {
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.9em;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    .status-pending {
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeaa7;
+    }
+    .status-preparing {
+      background: #cce5ff;
+      color: #004085;
+      border: 1px solid #99d6ff;
+    }
+    .status-ready {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    .status-completed {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    .order-time {
+      color: #666;
+      font-size: 0.9em;
+      margin-top: 5px;
+    }
+    .order-items {
+      margin-bottom: 20px;
+    }
+    .order-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .item-details {
+      flex: 1;
+    }
+    .item-name {
+      font-weight: bold;
+      color: #333;
+      font-size: 1.1em;
+    }
+    .item-description {
+      color: #666;
+      font-size: 0.9em;
+      margin-top: 3px;
+    }
+    .item-quantity-price {
+      text-align: right;
+      font-weight: bold;
+      color: #007bff;
+    }
+    .special-instructions {
+      background: #f8f9fa;
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 15px;
+      font-style: italic;
+      color: #666;
+    }
+    .order-total {
+      text-align: right;
+      font-size: 1.3em;
+      font-weight: bold;
+      color: #333;
+      margin-top: 20px;
+      padding-top: 15px;
+      border-top: 2px solid #f0f0f0;
+    }
+    .no-orders {
+      text-align: center;
+      padding: 60px;
+      color: #666;
+    }
+    .no-orders h3 {
+      margin-bottom: 15px;
+    }
+    .no-orders a {
+      color: #007bff;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .no-orders a:hover {
+      text-decoration: underline;
+    }
+    .nav-links {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .nav-links a {
+      margin: 0 15px;
+      text-decoration: none;
+      color: #007bff;
+      font-size: 1.1em;
+      padding: 8px 16px;
+      border: 1px solid #007bff;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+    .nav-links a:hover {
+      background-color: #007bff;
+      color: white;
+    }
+    .real-time-indicator {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #28a745;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 20px;
+      font-size: 0.9em;
+      display: none;
+      align-items: center;
+      gap: 8px;
+    }
+    .pulse {
+      width: 8px;
+      height: 8px;
+      background: white;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.3; }
+      100% { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="orders-container">
+    <!-- Real-time indicator -->
+    <div class="real-time-indicator" id="realTimeIndicator" style="display: none;">
+      <div class="pulse"></div>
+      Live Updates
+    </div>
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div>
+        <h1>📋 My Orders</h1>
+        <p>Track your order status in real-time</p>
+      </div>
+      <div class="user-info">
+        <div id="userName">Loading...</div>
+        <form method="POST" action="/auth/signout" style="margin-top: 10px;">
+          <button type="submit" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 5px 10px; border-radius: 4px; cursor: pointer;">Sign Out</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav-links">
+      <a href="/">🏠 Home</a>
+      <a href="/menu/taco">🌮 Tacos</a>
+      <a href="/menu/burger">🍔 Burgers</a>
+      <a href="/menu/salad">🥗 Salads</a>
+      <a href="/meals">📋 All Meals</a>
+    </div>
+
+    <!-- Orders Container -->
+    <div id="ordersContainer">
+      <div class="no-orders">
+        <h3>Loading your orders...</h3>
+        <p>Please wait while we fetch your order history.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let orders = [];
+    let socket = null;
+
+    // Initialize real-time connection
+    function initRealTimeConnection() {
+      try {
+        socket = io();
+        
+        socket.on('orderStatusUpdate', (data) => {
+          console.log('Received order status update:', data);
+          updateOrderInUI(data.orderId, data.status);
+        });
+
+        socket.on('connect', () => {
+          console.log('Connected to real-time updates');
+          document.getElementById('realTimeIndicator').style.display = 'flex';
+        });
+
+        socket.on('disconnect', () => {
+          console.log('Disconnected from real-time updates');
+          document.getElementById('realTimeIndicator').style.display = 'none';
+        });
+      } catch (error) {
+        console.error('Failed to initialize real-time connection:', error);
+      }
+    }
+
+    // Fetch customer orders
+    async function fetchOrders() {
+      try {
+        const response = await fetch('/orders/my-orders');
+        const data = await response.json();
+        
+        if (data.orders) {
+          orders = data.orders;
+          renderOrders();
+        } else {
+          showError('Failed to load orders');
+        }
+      } catch (error) {
+        console.error('Error fetching orders:', error);
+        showError('Error loading orders');
+      }
+    }
+
+    // Render orders in UI
+    function renderOrders() {
+      const container = document.getElementById('ordersContainer');
+      
+      if (orders.length === 0) {
+        container.innerHTML = `
+          <div class="no-orders">
+            <h3>No orders yet</h3>
+            <p>Start by <a href="/">browsing our menu</a> and placing your first order!</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = orders.map(order => `
+        <div class="order-card" data-order-id="${order.id}">
+          <div class="order-header">
+            <div>
+              <div class="order-number">Order #${order.id.substring(0, 8)}</div>
+              <div class="order-time">${new Date(order.created_at).toLocaleString()}</div>
+            </div>
+            <div>
+              <span class="order-status status-${order.status.toLowerCase()}">
+                ${order.status}
+              </span>
+            </div>
+          </div>
+
+          ${order.special_instructions ? `
+            <div class="special-instructions">
+              <strong>Special Instructions:</strong> ${order.special_instructions}
+            </div>
+          ` : ''}
+
+          <div class="order-items">
+            ${order.order_items.map(item => `
+              <div class="order-item">
+                <div class="item-details">
+                  <div class="item-name">${item.meals.name}</div>
+                  <div class="item-description">
+                    ${item.meals.protein_name} (${item.meals.protein_preparation}) • 
+                    ${item.meals.salsa_name} (${item.meals.salsa_spiciness})
+                  </div>
+                  ${item.notes ? `<div class="item-description" style="color: #007bff;">Note: ${item.notes}</div>` : ''}
+                </div>
+                <div class="item-quantity-price">
+                  ×${item.quantity} - $${(item.unit_price * item.quantity).toFixed(2)}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+
+          <div class="order-total">
+            Total: $${order.total_amount.toFixed(2)}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Update specific order in UI
+    function updateOrderInUI(orderId, newStatus) {
+      const orderCard = document.querySelector(`[data-order-id="${orderId}"]`);
+      if (orderCard) {
+        const statusElement = orderCard.querySelector('.order-status');
+        statusElement.className = `order-status status-${newStatus.toLowerCase()}`;
+        statusElement.textContent = newStatus;
+        
+        // Show notification
+        showNotification(`Order #${orderId.substring(0, 8)} status updated to: ${newStatus}`);
+      }
+    }
+
+    // Show notification
+    function showNotification(message) {
+      // Create notification element
+      const notification = document.createElement('div');
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #28a745;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        z-index: 1000;
+        animation: slideDown 0.3s ease;
+      `;
+      notification.textContent = message;
+      
+      document.body.appendChild(notification);
+      
+      // Remove after 3 seconds
+      setTimeout(() => {
+        notification.remove();
+      }, 3000);
+    }
+
+    // Show error message
+    function showError(message) {
+      const container = document.getElementById('ordersContainer');
+      container.innerHTML = `
+        <div class="no-orders">
+          <h3 style="color: #dc3545;">Error</h3>
+          <p>${message}</p>
+          <button onclick="location.reload()" style="background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">Retry</button>
+        </div>
+      `;
+    }
+
+    // Load user info (would come from session in production)
+    function loadUserInfo() {
+      // This would be populated from server-side session data
+      document.getElementById('userName').textContent = 'Customer'; // Placeholder
+    }
+
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', () => {
+      loadUserInfo();
+      fetchOrders();
+      initRealTimeConnection();
+      
+      // Refresh orders every 30 seconds as fallback
+      setInterval(fetchOrders, 30000);
+    });
+
+    // Add CSS animation
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes slideDown {
+        from { transform: translate(-50%, -100%); opacity: 0; }
+        to { transform: translate(-50%, 0); opacity: 1; }
+      }
+    `;
+    document.head.appendChild(style);
+  </script>
+</body>
+</html>

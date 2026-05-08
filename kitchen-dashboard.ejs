@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Kitchen Dashboard - Restaurant System</title>
+  <link rel="stylesheet" type="text/css" href="/styles/main.css">
+  <style>
+    .dashboard-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .dashboard-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .user-info {
+      text-align: right;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    .stat-card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      border-left: 4px solid #007bff;
+    }
+    .stat-number {
+      font-size: 2em;
+      font-weight: bold;
+      color: #333;
+    }
+    .stat-label {
+      color: #666;
+      margin-top: 5px;
+    }
+    .orders-section {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .order-card {
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+    }
+    .order-card:hover {
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .order-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+    .order-number {
+      font-size: 1.2em;
+      font-weight: bold;
+      color: #333;
+    }
+    .order-status {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.9em;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    .status-pending {
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeaa7;
+    }
+    .status-preparing {
+      background: #cce5ff;
+      color: #004085;
+      border: 1px solid #99d6ff;
+    }
+    .status-ready {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    .status-completed {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    .customer-info {
+      margin-bottom: 15px;
+    }
+    .customer-name {
+      font-weight: bold;
+      color: #333;
+    }
+    .order-time {
+      color: #666;
+      font-size: 0.9em;
+    }
+    .order-items {
+      margin-bottom: 15px;
+    }
+    .order-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .item-details {
+      flex: 1;
+    }
+    .item-name {
+      font-weight: bold;
+      color: #333;
+    }
+    .item-description {
+      color: #666;
+      font-size: 0.9em;
+    }
+    .item-quantity {
+      font-weight: bold;
+      color: #007bff;
+    }
+    .special-instructions {
+      background: #f8f9fa;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 15px;
+      font-style: italic;
+      color: #666;
+    }
+    .order-total {
+      text-align: right;
+      font-size: 1.2em;
+      font-weight: bold;
+      color: #333;
+      margin-top: 15px;
+    }
+    .status-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    .status-btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+    .status-btn:hover {
+      transform: translateY(-1px);
+    }
+    .btn-preparing {
+      background: #007bff;
+      color: white;
+    }
+    .btn-ready {
+      background: #28a745;
+      color: white;
+    }
+    .btn-completed {
+      background: #dc3545;
+      color: white;
+    }
+    .payment-status {
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 0.8em;
+      font-weight: bold;
+    }
+    .payment-paid {
+      background: #d4edda;
+      color: #155724;
+    }
+    .payment-pending {
+      background: #fff3cd;
+      color: #856404;
+    }
+    .real-time-indicator {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #28a745;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 20px;
+      font-size: 0.9em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .pulse {
+      width: 8px;
+      height: 8px;
+      background: white;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.3; }
+      100% { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-container">
+    <!-- Real-time indicator -->
+    <div class="real-time-indicator">
+      <div class="pulse"></div>
+      Live Updates
+    </div>
+
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+      <div>
+        <h1>🍳 Kitchen Dashboard</h1>
+        <p>Manage orders in real-time</p>
+      </div>
+      <div class="user-info">
+        <div><%= profile.full_name %></div>
+        <div style="font-size: 0.9em; opacity: 0.8;">Kitchen Staff</div>
+        <form method="POST" action="/auth/signout" style="margin-top: 10px;">
+          <button type="submit" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 5px 10px; border-radius: 4px; cursor: pointer;">Sign Out</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-number"><%= stats.total %></div>
+        <div class="stat-label">Total Orders</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number"><%= stats.pending %></div>
+        <div class="stat-label">Pending</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number"><%= stats.preparing %></div>
+        <div class="stat-label">Preparing</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number"><%= stats.ready %></div>
+        <div class="stat-label">Ready</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number"><%= stats.completed %></div>
+        <div class="stat-label">Completed</div>
+      </div>
+    </div>
+
+    <!-- Orders Section -->
+    <div class="orders-section">
+      <div class="section-header">
+        <h2>📋 Active Orders</h2>
+        <div id="lastUpdate">Last updated: <%= new Date().toLocaleTimeString() %></div>
+      </div>
+
+      <% if (orders && orders.length > 0) { %>
+        <% orders.forEach(function(order) { %>
+          <div class="order-card" data-order-id="<%= order.id %>">
+            <div class="order-header">
+              <div>
+                <div class="order-number">Order #<%= order.id.substring(0, 8) %></div>
+                <div class="order-time"><%= new Date(order.created_at).toLocaleString() %></div>
+              </div>
+              <div>
+                <span class="order-status status-<%= order.status.toLowerCase() %>">
+                  <%= order.status %>
+                </span>
+                <span class="payment-status payment-<%= order.payment_status.toLowerCase() %>">
+                  <%= order.payment_status %>
+                </span>
+              </div>
+            </div>
+
+            <div class="customer-info">
+              <div class="customer-name">👤 <%= order.profiles.full_name %></div>
+            </div>
+
+            <% if (order.special_instructions) { %>
+              <div class="special-instructions">
+                <strong>Special Instructions:</strong> <%= order.special_instructions %>
+              </div>
+            <% } %>
+
+            <div class="order-items">
+              <% order.order_items.forEach(function(item) { %>
+                <div class="order-item">
+                  <div class="item-details">
+                    <div class="item-name"><%= item.meals.name %></div>
+                    <div class="item-description">
+                      <%= item.meals.protein_name %> (<%= item.meals.protein_preparation %>) • 
+                      <%= item.meals.salsa_name %> (<%= item.meals.salsa_spiciness %>)
+                    </div>
+                    <% if (item.notes) { %>
+                      <div class="item-description" style="color: #007bff;">
+                        Note: <%= item.notes %>
+                      </div>
+                    <% } %>
+                  </div>
+                  <div class="item-quantity">× <%= item.quantity %></div>
+                </div>
+              <% }); %>
+            </div>
+
+            <div class="order-total">
+              Total: $<%= order.total_amount.toFixed(2) %>
+            </div>
+
+            <!-- Status Update Actions -->
+            <div class="status-actions">
+              <% if (order.status === 'Pending') { %>
+                <button class="status-btn btn-preparing" onclick="updateOrderStatus('<%= order.id %>', 'Preparing')">
+                  Start Preparing
+                </button>
+              <% } %>
+              <% if (order.status === 'Preparing') { %>
+                <button class="status-btn btn-ready" onclick="updateOrderStatus('<%= order.id %>', 'Ready')">
+                  Mark as Ready
+                </button>
+              <% } %>
+              <% if (order.status === 'Ready') { %>
+                <button class="status-btn btn-completed" onclick="updateOrderStatus('<%= order.id %>', 'Completed')">
+                  Complete Order
+                </button>
+              <% } %>
+            </div>
+          </div>
+        <% }); %>
+      <% } else { %>
+        <div style="text-align: center; padding: 40px; color: #666;">
+          <h3>No orders yet</h3>
+          <p>Orders will appear here when customers place them.</p>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  <script>
+    // Real-time order status updates
+    function updateOrderStatus(orderId, newStatus) {
+      fetch(`/kitchen/orders/${orderId}/status`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: newStatus })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Update the UI
+          const orderCard = document.querySelector(`[data-order-id="${orderId}"]`);
+          if (orderCard) {
+            const statusElement = orderCard.querySelector('.order-status');
+            statusElement.className = `order-status status-${newStatus.toLowerCase()}`;
+            statusElement.textContent = newStatus;
+            
+            // Update actions
+            const actionsContainer = orderCard.querySelector('.status-actions');
+            actionsContainer.innerHTML = getActionsForStatus(newStatus, orderId);
+            
+            // Update last update time
+            document.getElementById('lastUpdate').textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
+          }
+        } else {
+          alert('Failed to update order status');
+        }
+      })
+      .catch(error => {
+        console.error('Error updating order status:', error);
+        alert('Error updating order status');
+      });
+    }
+
+    function getActionsForStatus(status, orderId) {
+      switch(status) {
+        case 'Preparing':
+          return `<button class="status-btn btn-ready" onclick="updateOrderStatus('${orderId}', 'Ready')">Mark as Ready</button>`;
+        case 'Ready':
+          return `<button class="status-btn btn-completed" onclick="updateOrderStatus('${orderId}', 'Completed')">Complete Order</button>`;
+        case 'Completed':
+          return '<span style="color: #28a745; font-weight: bold;">✓ Completed</span>';
+        default:
+          return '';
+      }
+    }
+
+    // Simulate real-time updates (replace with actual WebSocket/Supabase Realtime)
+    setInterval(() => {
+      // In production, this would be replaced with Supabase Realtime subscription
+      document.getElementById('lastUpdate').textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
+    }, 30000); // Update every 30 seconds
+  </script>
+</body>
+</html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title><%= mealType.charAt(0).toUpperCase() + mealType.slice(1) %> Menu</title>
+  <link rel="stylesheet" type="text/css" href="/styles/main.css">
+  <style>
+    .menu-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .meal-card {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      background-color: #f9f9f9;
+      transition: transform 0.2s;
+    }
+    .meal-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .meal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .meal-name {
+      font-size: 1.5em;
+      font-weight: bold;
+      color: #333;
+    }
+    .meal-price {
+      font-size: 1.3em;
+      color: #4CAF50;
+      font-weight: bold;
+    }
+    .meal-details {
+      margin-top: 10px;
+    }
+    .detail-item {
+      margin-bottom: 8px;
+      padding: 5px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .detail-label {
+      font-weight: bold;
+      color: #555;
+      display: inline-block;
+      width: 150px;
+    }
+    .nav-links {
+      text-align: center;
+      margin-bottom: 30px;
+      padding: 20px;
+      background-color: #f0f0f0;
+      border-radius: 8px;
+    }
+    .nav-links a {
+      margin: 0 15px;
+      text-decoration: none;
+      color: #007bff;
+      font-size: 1.1em;
+      padding: 8px 16px;
+      border: 1px solid #007bff;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+    .nav-links a:hover {
+      background-color: #007bff;
+      color: white;
+    }
+    .no-meals {
+      text-align: center;
+      color: #666;
+      font-style: italic;
+      padding: 40px;
+    }
+    .page-title {
+      text-align: center;
+      color: #333;
+      margin-bottom: 30px;
+      font-size: 2.5em;
+    }
+    .meal-type-icon {
+      font-size: 1.2em;
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="menu-container">
+    <h1 class="page-title">
+      <span class="meal-type-icon">
+        <% if (mealType === 'taco') { %>🌮<% } %>
+        <% if (mealType === 'burger') { %>🍔<% } %>
+        <% if (mealType === 'salad') { %>🥗<% } %>
+        <% if (mealType === 'pasta') { %>🍝<% } %>
+        <% if (mealType === 'pizza') { %>🍕<% } %>
+        <% if (mealType === 'other') { %>🍽️<% } %>
+      </span>
+      <%= mealType.charAt(0).toUpperCase() + mealType.slice(1) %> Menu
+    </h1>
+    
+    <div class="nav-links">
+      <a href="/">Home</a>
+      <a href="/meals">All Meals</a>
+      <a href="/add-meal">Add New Meal</a>
+    </div>
+
+    <% if (meals && meals.length > 0) { %>
+      <% meals.forEach(function(meal) { %>
+        <div class="meal-card">
+          <div class="meal-header">
+            <span class="meal-name"><%= meal.name %></span>
+            <span class="meal-price">$<%= meal.price.toFixed(2) %></span>
+          </div>
+          
+          <div class="meal-details">
+            <div class="detail-item">
+              <span class="detail-label">Protein:</span>
+              <%= meal.protein_name %> (<%= meal.protein_preparation %>)
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Sauce/Salsa:</span>
+              <%= meal.salsa_name %> (<%= meal.salsa_spiciness %>)
+            </div>
+            <% if (meal.created_at) { %>
+              <div class="detail-item">
+                <span class="detail-label">Added:</span>
+                <%= new Date(meal.created_at).toLocaleDateString() %>
+              </div>
+            <% } %>
+          </div>
+        </div>
+      <% }); %>
+    <% } else { %>
+      <div class="no-meals">
+        <h3>No <%= mealType %> meals found.</h3>
+        <p>Be the first to add a <%= mealType %> meal! <a href="/add-meal">Add one now</a></p>
+      </div>
+    <% } %>
+  </div>
+</body>
+</html>

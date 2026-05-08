@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Add New Meal</title>
+  <link rel="stylesheet" type="text/css" href="/styles/main.css">
+  <style>
+    .form-container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    input[type="text"],
+    input[type="number"],
+    select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .btn {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .btn:hover {
+      background-color: #45a049;
+    }
+    .nav-links {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .nav-links a {
+      margin: 0 10px;
+      text-decoration: none;
+      color: #007bff;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <h1>Add New Meal 🍽️</h1>
+    
+    <div class="nav-links">
+      <a href="/">Home</a>
+      <a href="/meals">View Meals</a>
+    </div>
+
+    <form action="/add-meal" method="POST">
+      <div class="form-group">
+        <label for="name">Meal Name:</label>
+        <input type="text" id="name" name="name" required>
+      </div>
+
+      <div class="form-group">
+        <label for="type">Meal Type:</label>
+        <select id="type" name="type" required>
+          <option value="">Select type...</option>
+          <option value="taco">Taco</option>
+          <option value="burger">Burger</option>
+          <option value="salad">Salad</option>
+          <option value="pasta">Pasta</option>
+          <option value="pizza">Pizza</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="price">Price:</label>
+        <input type="number" id="price" name="price" step="0.01" min="0" required>
+      </div>
+
+      <div class="form-group">
+        <label for="protein_name">Protein Name:</label>
+        <input type="text" id="protein_name" name="protein_name" required>
+      </div>
+
+      <div class="form-group">
+        <label for="protein_preparation">Protein Preparation:</label>
+        <input type="text" id="protein_preparation" name="protein_preparation" required>
+      </div>
+
+      <div class="form-group">
+        <label for="salsa_name">Sauce/Salsa Name:</label>
+        <input type="text" id="salsa_name" name="salsa_name" required>
+      </div>
+
+      <div class="form-group">
+        <label for="salsa_spiciness">Spiciness Level:</label>
+        <select id="salsa_spiciness" name="salsa_spiciness" required>
+          <option value="">Select spiciness...</option>
+          <option value="Mild">Mild</option>
+          <option value="Medium">Medium</option>
+          <option value="Hot">Hot</option>
+          <option value="Extra Hot">Extra Hot</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn">Add Meal</button>
+    </form>
+  </div>
+</body>
+</html>

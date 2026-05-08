@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Taco Recipes</title>
+  <link rel="stylesheet" type="text/css" href="/styles/main.css">
+  <style>
+    .menu-section {
+      margin-bottom: 40px;
+      padding: 20px;
+      background-color: #f8f9fa;
+      border-radius: 12px;
+    }
+    .meal-types {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .meal-type-card {
+      background: white;
+      border: 2px solid #e9ecef;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .meal-type-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+      border-color: #007bff;
+    }
+    .meal-type-card h3 {
+      margin: 0 0 10px 0;
+      color: #333;
+      font-size: 1.4em;
+    }
+    .meal-count {
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 8px;
+    }
+    .price-range {
+      font-weight: bold;
+      color: #4CAF50;
+      font-size: 1.1em;
+      margin-bottom: 15px;
+    }
+    .view-menu-btn {
+      display: inline-block;
+      background-color: #007bff;
+      color: white;
+      padding: 10px 20px;
+      text-decoration: none;
+      border-radius: 6px;
+      transition: background-color 0.3s;
+    }
+    .view-menu-btn:hover {
+      background-color: #0056b3;
+      text-decoration: none;
+      color: white;
+    }
+    .taco-section {
+      margin-top: 40px;
+      padding: 20px;
+      background-color: #fff3cd;
+      border-radius: 12px;
+      border: 2px solid #ffeaa7;
+    }
+    .no-meals-message {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+      font-style: italic;
+    }
+    .no-meals-message a {
+      color: #007bff;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .no-meals-message a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Taco Town & More �️</h1>
+  
+  <div class="nav-links" style="text-align: center; margin-bottom: 30px;">
+    <a href="/add-meal" style="margin: 0 15px; text-decoration: none; color: #007bff; font-size: 1.1em;">Add Meal</a>
+    <a href="/meals" style="margin: 0 15px; text-decoration: none; color: #007bff; font-size: 1.1em;">View All Meals</a>
+    <a href="/my-orders" style="margin: 0 15px; text-decoration: none; color: #007bff; font-size: 1.1em;">📋 My Orders</a>
+    <a href="/auth/signin" style="margin: 0 15px; text-decoration: none; color: #28a745; font-size: 1.1em;">🔐 Sign In</a>
+    <a href="/auth/signup" style="margin: 0 15px; text-decoration: none; color: #ffc107; font-size: 1.1em;">👤 Sign Up</a>
+    <div id="cartIndicator" style="display: none; background: #dc3545; color: white; padding: 5px 10px; border-radius: 15px; font-size: 0.9em;">
+      🛒 Cart: <span id="cartCount">0</span>
+    </div>
+  </div>
+
+  <!-- Meal Types Menu -->
+  <div class="menu-section">
+    <h2>Our Menu 📋</h2>
+    <% if (mealsByType && Object.keys(mealsByType).length > 0) { %>
+      <div class="meal-types">
+        <% Object.keys(mealsByType).forEach(function(type) { %>
+          <div class="meal-type-card">
+            <h3>
+              <% if (type === 'taco') { %>🌮 Tacos<% } %>
+              <% if (type === 'burger') { %>🍔 Burgers<% } %>
+              <% if (type === 'salad') { %>🥗 Salads<% } %>
+              <% if (type === 'pasta') { %>🍝 Pasta<% } %>
+              <% if (type === 'pizza') { %>🍕 Pizza<% } %>
+              <% if (type === 'other') { %>🍽️ Other<% } %>
+            </h3>
+            <div class="meal-count"><%= mealsByType[type].length %> items</div>
+            <div class="price-range">
+              <% if (mealsByType[type].length > 0) { %>
+                $<%= Math.min(...mealsByType[type].map(m => m.price)).toFixed(2) %> - $<%= Math.max(...mealsByType[type].map(m => m.price)).toFixed(2) %>
+              <% } %>
+            </div>
+            <a href="/menu/<%= type %>" class="view-menu-btn">View <%= type.charAt(0).toUpperCase() + type.slice(1) %> Menu</a>
+            <button class="add-to-cart-btn" 
+                    data-meal-id="<%= mealsByType[type][0]?.id %>" 
+                    data-meal-name="<%= type.charAt(0).toUpperCase() + type.slice(1) %>"
+                    data-price="<%= mealsByType[type][0]?.price || 0 %>"
+                    data-protein-name="<%= mealsByType[type][0]?.protein_name || '' %>"
+                    data-protein-prep="<%= mealsByType[type][0]?.protein_preparation || '' %>"
+                    data-salsa-name="<%= mealsByType[type][0]?.salsa_name || '' %>"
+                    data-salsa-spicy="<%= mealsByType[type][0]?.salsa_spiciness || '' %>">
+              🛒 Add to Cart
+            </button>
+          </div>
+        <% }); %>
+      </div>
+    <% } else { %>
+      <div class="no-meals-message">
+        <p>No meals available yet. <a href="/add-meal">Add your first meal!</a></p>
+      </div>
+    <% } %>
+  </div>
+
+  <!-- Cart Modal -->
+  <div id="cartModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
+    <div style="position: relative; max-width: 600px; margin: 50px auto; background: white; padding: 20px; border-radius: 12px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2>🛒 Your Cart</h2>
+        <button onclick="closeCart()" style="background: none; border: none; font-size: 24px; cursor: pointer;">×</button>
+      </div>
+      <div id="cartItems"></div>
+      <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #f0f0f0;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <strong>Total: $<span id="cartTotal">0.00</span></strong>
+          </div>
+          <div>
+            <button onclick="clearCart()" style="background: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 4px; margin-right: 10px; cursor: pointer;">Clear</button>
+            <button onclick="placeOrder()" style="background: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">Place Order</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let cart = [];
+    
+    // Load cart from session
+    async function loadCart() {
+      try {
+        const response = await fetch('/api/cart');
+        if (response.ok) {
+          const data = await response.json();
+          cart = data.cart || [];
+          updateCartUI();
+        }
+      } catch (error) {
+        console.error('Error loading cart:', error);
+      }
+    }
+
+    // Add item to cart
+    async function addToCart(mealId, mealName, price, proteinName, proteinPrep, salsaName, salsaSpicy) {
+      const quantity = prompt(`How many ${mealName} would you like?`, '1');
+      if (!quantity || quantity <= 0) return;
+
+      const notes = prompt('Any special instructions for this item?', '');
+
+      try {
+        const response = await fetch('/add-to-cart', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            meal_id: mealId,
+            quantity: parseInt(quantity),
+            notes: notes
+          })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          cart = data.cart || [];
+          updateCartUI();
+          showNotification(`${mealName} added to cart!`);
+        } else {
+          const error = await response.json();
+          alert(error.error || 'Failed to add to cart');
+        }
+      } catch (error) {
+        console.error('Error adding to cart:', error);
+        alert('Error adding to cart');
+      }
+    }
+
+    // Update cart UI
+    function updateCartUI() {
+      const cartCount = document.getElementById('cartCount');
+      const cartIndicator = document.getElementById('cartIndicator');
+      const cartTotal = document.getElementById('cartTotal');
+      const cartItems = document.getElementById('cartItems');
+
+      if (cart.length > 0) {
+        cartCount.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+        cartIndicator.style.display = 'inline-block';
+        
+        const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        cartTotal.textContent = total.toFixed(2);
+
+        cartItems.innerHTML = cart.map(item => `
+          <div style="padding: 10px 0; border-bottom: 1px solid #f0f0f0;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <strong>${item.name}</strong><br>
+                <small style="color: #666;">${item.protein_name} (${item.protein_preparation})</small>
+                ${item.notes ? `<br><small style="color: #007bff;">Note: ${item.notes}</small>` : ''}
+              </div>
+              <div>
+                <span style="font-weight: bold;">×${item.quantity}</span>
+                <span style="margin-left: 10px;">$${(item.price * item.quantity).toFixed(2)}</span>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      } else {
+        cartCount.textContent = '0';
+        cartIndicator.style.display = 'none';
+        cartTotal.textContent = '0.00';
+        cartItems.innerHTML = '<p style="text-align: center; color: #666;">Your cart is empty</p>';
+      }
+    }
+
+    // Show cart modal
+    function showCart() {
+      document.getElementById('cartModal').style.display = 'block';
+    }
+
+    // Close cart modal
+    function closeCart() {
+      document.getElementById('cartModal').style.display = 'none';
+    }
+
+    // Clear cart
+    async function clearCart() {
+      try {
+        const response = await fetch('/api/cart/clear', { method: 'POST' });
+        if (response.ok) {
+          cart = [];
+          updateCartUI();
+          showNotification('Cart cleared');
+        }
+      } catch (error) {
+        console.error('Error clearing cart:', error);
+      }
+    }
+
+    // Place order
+    async function placeOrder() {
+      if (cart.length === 0) {
+        alert('Your cart is empty');
+        return;
+      }
+
+      const specialInstructions = prompt('Any special instructions for your order?', '');
+
+      try {
+        const response = await fetch('/place-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            special_instructions: specialInstructions
+          })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          cart = [];
+          updateCartUI();
+          closeCart();
+          showNotification('Order placed successfully! Check your email for confirmation.');
+          setTimeout(() => {
+            window.location.href = '/my-orders';
+          }, 2000);
+        } else {
+          const error = await response.json();
+          alert(error.error || 'Failed to place order');
+        }
+      } catch (error) {
+        console.error('Error placing order:', error);
+        alert('Error placing order');
+      }
+    }
+
+    // Show notification
+    function showNotification(message) {
+      const notification = document.createElement('div');
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #28a745;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        z-index: 1001;
+        animation: slideIn 0.3s ease;
+      `;
+      notification.textContent = message;
+      document.body.appendChild(notification);
+
+      setTimeout(() => {
+        notification.remove();
+      }, 3000);
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      loadCart();
+      
+      // Add click handlers to meal cards
+      document.addEventListener('click', (e) => {
+        if (e.target.matches('.add-to-cart-btn')) {
+          const mealId = e.target.dataset.mealId;
+          const mealName = e.target.dataset.mealName;
+          const price = parseFloat(e.target.dataset.price);
+          const proteinName = e.target.dataset.proteinName;
+          const proteinPrep = e.target.dataset.proteinPrep;
+          const salsaName = e.target.dataset.salsaName;
+          const salsaSpicy = e.target.dataset.salsaSpicy;
+          
+          addToCart(mealId, mealName, price, proteinName, proteinPrep, salsaName, salsaSpicy);
+        }
+      });
+
+      // Close modal on outside click
+      document.getElementById('cartModal').addEventListener('click', (e) => {
+        if (e.target.id === 'cartModal') {
+          closeCart();
+        }
+      });
+    });
+
+    // Add animation CSS
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+      
+      .add-to-cart-btn {
+        background: #28a745;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-top: 10px;
+        font-size: 0.9em;
+        transition: background 0.3s;
+      }
+      
+      .add-to-cart-btn:hover {
+        background: #218838;
+      }
+    `;
+    document.head.appendChild(style);
+  </script>
+  </div>
+
+  <!-- Original Taco Selection -->
+  <div class="taco-section">
+    <h2>Quick Taco Selection 🌮</h2>
+    <form action="/recipe" method="POST" class="buttons">
+      <button type="submit" value="chicken" name="choice">🍗</button>
+      <button type="submit" value="beef" name="choice">🥩</button>
+      <button type="submit" value="fish" name="choice">🐟</button>
+    </form>
+  <div id="recipeContainer" class="hidden">
+
+    <% if (locals.recipe){ %>
+    <h2> <% recipe.name %> </h2>
+  <h3>Ingredients</h3>
+<ul>
+  <li> <% recipe.ingredients.protein.name %>, <%= recipe.ingredients.protein.preparation %> </li>
+
+
+
+
+
+</ul>
+    <% } %>
+
+    <!-- If no recipe yet, show: -->
+    <h2>Pick your favourite taco ingredient 👆</h2>
+    <!-- Else, show the recipe name e.g. <h2>Recipe name</h2>-->
+
+    <h3>Ingredients:</h3>
+    <ul id="ingredientsList">
+      <li>Protein name, protein preparation</li>
+      <li>Salsa name</li>
+      <li>Every other topping</li>
+    </ul>
+
+
+
+  </div>
+</body>
+
+</html>
